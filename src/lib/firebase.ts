@@ -75,11 +75,12 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
 export async function createUserProfile(uid: string, email: string, displayName: string, role: UserRole = UserRole.INVESTOR) {
   const path = `users/${uid}`;
   try {
-    const userProfile: UserProfile = {
+    const userProfile = {
       uid,
       email,
       displayName,
       role,
+      walletBalance: 100000,
       createdAt: serverTimestamp(),
     };
     await updateDoc(doc(db, 'users', uid), { ...userProfile });
@@ -88,11 +89,12 @@ export async function createUserProfile(uid: string, email: string, displayName:
     // However, in our flow, we often use setDoc for initial creation.
     try {
       const { setDoc } = await import('firebase/firestore');
-      const userProfile: UserProfile = {
+      const userProfile = {
         uid,
         email,
         displayName,
         role,
+        walletBalance: 100000,
         createdAt: serverTimestamp(),
       };
       await setDoc(doc(db, 'users', uid), userProfile);

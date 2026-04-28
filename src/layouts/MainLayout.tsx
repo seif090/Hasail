@@ -68,12 +68,14 @@ export default function MainLayout() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-4">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-64 p-0">
+              <SheetTrigger 
+                render={
+                  <Button variant="ghost" size="icon" className="lg:hidden">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                } 
+              />
+              <SheetContent side="left" className="w-64 p-0">
                 <div className="flex flex-col h-full border-r bg-white">
                   <div className="flex h-16 items-center border-b px-6 gap-2">
                     <Leaf className="h-6 w-6 text-primary" />
@@ -101,9 +103,11 @@ export default function MainLayout() {
               </SheetContent>
             </Sheet>
 
-            <Link to="/" className="flex items-center gap-2">
-              <Leaf className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-black text-primary tracking-tight">حصائل</span>
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center">
+                <Leaf className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold tracking-tight text-emerald-900">حصائل</span>
             </Link>
           </div>
 
@@ -113,8 +117,8 @@ export default function MainLayout() {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "text-sm font-bold transition-colors hover:text-primary",
-                  location.pathname === item.path ? "text-primary" : "text-neutral-500"
+                  "text-sm font-semibold transition-colors hover:text-emerald-600",
+                  location.pathname === item.path ? "text-emerald-700 underline underline-offset-8" : "text-slate-500"
                 )}
               >
                 {item.name}
@@ -124,34 +128,38 @@ export default function MainLayout() {
 
           <div className="flex items-center gap-3">
             {loading ? (
-              <div className="h-10 w-24 animate-pulse bg-neutral-100 rounded-full" />
+              <div className="h-10 w-24 animate-pulse bg-slate-100 rounded-full" />
             ) : user ? (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-auto flex items-center gap-2 px-2 rounded-full hover:bg-neutral-100 border border-neutral-100">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatarUrl} alt={user.displayName} />
-                      <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                        {user.displayName?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="hidden md:inline-block text-sm font-bold text-neutral-700">{user.displayName}</span>
-                    <ChevronDown className="h-4 w-4 text-neutral-400" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl border-neutral-100">
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="ghost" className="relative h-10 w-auto flex items-center gap-2 px-2 rounded-full hover:bg-slate-50 border border-slate-200">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatarUrl} alt={user.displayName} />
+                        <AvatarFallback className="bg-emerald-50 text-emerald-600 font-bold">
+                          {user.displayName?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="hidden md:inline-block text-sm font-semibold text-slate-700">{user.displayName}</span>
+                      <ChevronDown className="h-4 w-4 text-slate-400" />
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl border-slate-100 bg-white">
                   <div className="px-3 py-2">
-                    <p className="text-xs font-black text-neutral-400 uppercase tracking-widest">نوع الحساب</p>
-                    <p className="text-sm font-bold text-primary">{user.role === 'investor' ? 'مستثمر' : user.role === 'operator' ? 'مشغل' : 'مسؤول'}</p>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">نوع الحساب</p>
+                    <p className="text-sm font-bold text-emerald-700">{user.role === 'investor' ? 'مستثمر' : user.role === 'operator' ? 'مشغل' : 'مسؤول'}</p>
                   </div>
-                  <DropdownMenuSeparator className="bg-neutral-50" />
-                  <DropdownMenuItem asChild className="rounded-xl focus:bg-neutral-50 cursor-pointer p-3 font-bold">
-                    <Link to="/dashboard" className="flex items-center gap-3">
-                      <LayoutDashboard className="h-4 w-4" />
-                      لوحة التحكم
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="rounded-xl focus:bg-red-50 focus:text-red-600 font-bold cursor-pointer p-3 gap-3">
+                  <DropdownMenuSeparator className="bg-slate-50" />
+                  <DropdownMenuItem 
+                    render={
+                      <Link to="/dashboard" className="rounded-xl focus:bg-slate-50 cursor-pointer p-3 font-semibold text-slate-700 flex items-center gap-3">
+                        <LayoutDashboard className="h-4 w-4" />
+                        لوحة التحكم
+                      </Link>
+                    }
+                  />
+                  <DropdownMenuItem onClick={handleLogout} className="rounded-xl focus:bg-red-50 focus:text-red-600 font-semibold cursor-pointer p-3 gap-3">
                     <LogOut className="h-4 w-4" />
                     تسجيل الخروج
                   </DropdownMenuItem>
@@ -160,10 +168,10 @@ export default function MainLayout() {
             ) : (
               <>
                 <Link to="/login" className="hidden sm:inline-block">
-                  <Button variant="ghost" className="font-bold">تسجيل الدخول</Button>
+                  <Button variant="ghost" className="font-semibold text-slate-600">تسجيل الدخول</Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="bg-primary hover:bg-primary/90 text-white font-bold rounded-full px-6 transition-all duration-300 shadow-lg shadow-primary/20">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl px-6 shadow-lg shadow-emerald-200/50 transition-all">
                     ابدأ الاستثمار
                   </Button>
                 </Link>

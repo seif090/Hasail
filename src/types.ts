@@ -14,6 +14,7 @@ export interface UserProfile {
   displayName: string;
   role: UserRole;
   avatarUrl?: string;
+  walletBalance: number;
   createdAt: any;
 }
 
@@ -28,6 +29,8 @@ export interface InvestmentOpportunity {
   images: string[];
   description: string;
   status: 'active' | 'closed';
+  startDate?: any;
+  endDate?: any;
 }
 
 export interface Activity {

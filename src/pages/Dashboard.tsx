@@ -10,7 +10,8 @@ import {
   CloudSun,
   Droplets,
   Sprout,
-  Users
+  Users,
+  ShieldCheck
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,12 +26,12 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 const MOCK_STATS = [
-  { label: "إجمالي الاستثمارات", value: "45,000 ر.س", icon: TrendingUpIcon, trend: "+12%" },
-  { label: "العائد التراكمي", value: "6,750 ر.س", icon: BarChartIcon, trend: "+8%" },
-  { label: "مساحات مفعلة", value: "3.5 هكتار", icon: MapPin, trend: "0%" },
+  { label: "إجمالي الاستثمارات", value: 45000, icon: TrendingUpIcon, trend: "+12.4%" },
+  { label: "العائد التراكمي", value: 6750, icon: BarChartIcon, trend: "+8.2%" },
+  { label: "مساحات مفعلة", value: 3.5, suffix: "هكتار", icon: MapPin, trend: "0%" },
   { label: "حالة المحصول", value: "ممتازة", icon: Sprout, trend: null },
 ];
 
@@ -48,35 +49,38 @@ const MOCK_TIMELINE = [
   {
     id: "1",
     type: "irrigation",
-    title: "عملية ري ذكي",
-    plot: "قطعة A-12",
+    title: "بدء عملية الري المحوري",
+    plot: "القطاع A-1",
     time: "منذ ساعتين",
     operator: "أحمد منصور",
     status: "completed",
     notes: "تم استخدام نظام الري بالتنقيط المتصل بمجسات التربة. نسبة الرطوبة الحالية 75%.",
-    image: "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?auto=format&fit=crop&q=80&w=600"
+    image: "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?auto=format&fit=crop&q=80&w=600",
+    icon: "💧"
   },
   {
     id: "2",
     type: "fertilization",
-    title: "إضافة أسمدة عضوية",
-    plot: "قطعة B-04",
+    title: "تسميد عضوي دوري",
+    plot: "القطاع C-3",
     time: "أمس، 4:30 م",
     operator: "سليمان العتيبي",
     status: "completed",
-    notes: "إضافة الدفعة الثانية من السماد المحفز للنمو الخضري.",
-    image: "https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?auto=format&fit=crop&q=80&w=600"
+    notes: "إضافة الدفعة الثانية من السماد المحفز للنمو الخضري لزيادة جودة الثمار.",
+    image: "https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?auto=format&fit=crop&q=80&w=600",
+    icon: "🧪"
   },
   {
     id: "3",
-    type: "planting",
-    title: "زراعة شتلات جديدة",
-    plot: "القطاع الشرقي",
-    time: "3 أيام",
-    operator: "أحمد منصور",
+    type: "photo",
+    title: "تحديث الحالة المصورة",
+    plot: "مزارع الزيتون",
+    time: "15 أكتوبر",
+    operator: "فهد الشهري",
     status: "completed",
-    notes: "تم زراعة 500 شتلة ليمون حساوي جديدة.",
-    image: "https://images.unsplash.com/photo-1592398514532-690227918f69?auto=format&fit=crop&q=80&w=600"
+    notes: "نمو البراعم يسير بشكل ممتاز وفق الخطة الزمنية المعتمدة.",
+    image: "https://images.unsplash.com/photo-1592398514532-690227918f69?auto=format&fit=crop&q=80&w=600",
+    icon: "📸"
   }
 ];
 
@@ -101,144 +105,162 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-neutral-50">
-        <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="h-12 w-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Use the profile role or fall back to 'investor' for testing
   const userRole = userProfile?.role || UserRole.INVESTOR;
 
+  const displayStats = [
+    { 
+      label: "إجمالي الرصيد", 
+      value: userProfile?.walletBalance ?? 100000, 
+      icon: TrendingUpIcon, 
+      trend: null 
+    },
+    ...MOCK_STATS.slice(1)
+  ];
+
   return (
-    <div className="bg-neutral-50 min-h-screen py-10">
-      <div className="container mx-auto px-6">
+    <div className="bg-slate-50 min-h-screen py-10">
+      <div className="container mx-auto px-6 max-w-7xl">
         {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div className="text-start">
-             <h1 className="text-3xl font-black text-neutral-900 mb-2">أهلاً بك، {userProfile?.displayName || "مستثمر حصائل"}</h1>
-             <p className="text-neutral-500 font-bold">مرحباً بك في لوحة تحكم منصة حصائل</p>
+             <h1 className="text-3xl font-bold text-slate-900 mb-1">لوحة الاستثمار</h1>
+             <p className="text-slate-500 font-medium italic">مرحباً بك مجدداً، {userProfile?.displayName || "مستثمر حصائل"}</p>
+          </div>
+          
+          <div className="flex gap-3">
+             <Button className="editorial-button editorial-button-primary">
+                فرص جديدة
+             </Button>
+             <Button variant="outline" className="editorial-button bg-white border-slate-200 text-slate-700">
+                تقارير PDF
+             </Button>
           </div>
         </div>
 
         {userRole === 'investor' ? (
-          <div className="space-y-10 text-start">
+          <div className="space-y-8 text-start">
             {/* Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {MOCK_STATS.map((stat, i) => (
-                <Card key={i} className="border-none shadow-sm rounded-3xl overflow-hidden bg-white hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                       <div className="p-3 bg-primary/5 rounded-2xl">
-                          <stat.icon className="h-6 w-6 text-primary" />
-                       </div>
-                       {stat.trend && (
-                         <Badge className="bg-emerald-50 text-emerald-600 border-none">
-                            {stat.trend}
-                         </Badge>
-                       )}
+              {displayStats.map((stat, i) => (
+                <div key={i} className="editorial-card p-6">
+                  <p className="text-slate-400 text-sm mb-1 font-medium">{stat.label}</p>
+                  <h3 className="text-2xl font-bold text-slate-900">
+                    {typeof stat.value === 'number' ? (
+                      (stat as any).suffix ? `${stat.value} ${(stat as any).suffix}` : formatCurrency(stat.value)
+                    ) : (
+                      stat.value
+                    )}
+                  </h3>
+                  {stat.trend && (
+                    <div className="mt-4 flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-0.5 rounded text-xs font-bold">
+                       <span>{stat.trend}</span>
+                       <stat.icon className="h-3 w-3" />
                     </div>
-                    <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest block mb-1">
-                      {stat.label}
-                    </span>
-                    <span className="text-2xl font-black text-neutral-900 tracking-tight">
-                      {stat.value}
-                    </span>
-                  </CardContent>
-                </Card>
+                  )}
+                </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Chart Card */}
-              <Card className="lg:col-span-2 border-none shadow-sm rounded-[2.5rem] bg-white p-8">
-                <CardHeader className="p-0 mb-8 border-none flex flex-row items-center justify-between">
-                  <CardTitle className="text-2xl font-black text-neutral-900">نمو عوائد المحاصيل</CardTitle>
-                  <Button variant="ghost" size="sm" className="font-bold text-primary">عرض التقارير</Button>
-                </CardHeader>
+              <div className="lg:col-span-2 editorial-card p-8">
+                <div className="flex justify-between items-center mb-8">
+                  <h4 className="text-xl font-bold text-slate-900">نمو عوائد المحاصيل</h4>
+                  <span className="text-xs text-emerald-600 font-bold cursor-pointer hover:underline">التفاصيل</span>
+                </div>
                 <div className="h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={MOCK_CHART_DATA}>
                       <defs>
                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#1E5E4C" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#1E5E4C" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#059669" stopOpacity={0.2}/>
+                          <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F0F0" />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                       <XAxis 
                         dataKey="name" 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{fill: '#A3A3A3', fontSize: 12, fontWeight: 700}}
+                        tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}}
                         dy={10}
                       />
                       <YAxis hide />
                       <Tooltip 
                         contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                        labelStyle={{fontWeight: 900, marginBottom: '5px'}}
+                        labelStyle={{fontWeight: 700, marginBottom: '5px'}}
                       />
                       <Area 
                         type="monotone" 
                         dataKey="value" 
-                        stroke="#1E5E4C" 
-                        strokeWidth={4}
+                        stroke="#059669" 
+                        strokeWidth={3}
                         fillOpacity={1} 
                         fill="url(#colorValue)" 
                       />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-              </Card>
+              </div>
 
               {/* Weather / Plot Status */}
               <div className="space-y-6">
-                <Card className="border-none shadow-sm rounded-[2rem] bg-white p-8 border-primary/10 border-t-4">
+                <div className="editorial-card p-8 border-l-4 border-emerald-600">
                    <div className="flex items-center justify-between mb-6">
                       <div className="flex flex-col">
-                        <span className="text-xs font-black text-neutral-400">الطقس حرك المزرعة</span>
-                        <span className="text-xl font-black text-neutral-900">صحو، 28°م</span>
+                        <span className="text-xs font-bold text-slate-400">الطقس في المزرعة</span>
+                        <span className="text-xl font-bold text-slate-900">صحو، 28°م</span>
                       </div>
-                      <CloudSun className="h-10 w-10 text-accent" />
+                      <CloudSun className="h-10 w-10 text-amber-500 opacity-80" />
                    </div>
                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                          <div className="flex items-center gap-3">
                             <Droplets className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm font-bold">نسبة الرطوبة</span>
+                            <span className="text-sm font-semibold text-slate-700">نسبة الرطوبة</span>
                          </div>
-                         <span className="font-black">65%</span>
+                         <span className="font-bold text-slate-900">65%</span>
                       </div>
-                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                          <div className="flex items-center gap-3">
                             <Sprout className="h-4 w-4 text-emerald-500" />
-                            <span className="text-sm font-bold">صحة المحصول</span>
+                            <span className="text-sm font-semibold text-slate-700">صحة المحصول</span>
                          </div>
-                         <span className="font-black text-emerald-600">ممتازة</span>
+                         <span className="font-bold text-emerald-600">ممتازة</span>
                       </div>
                    </div>
-                </Card>
+                </div>
 
-                <Card className="border-none shadow-sm rounded-[2rem] bg-neutral-900 p-8 text-white">
-                   <h3 className="text-xl font-black mb-4">تحديثات المزرعة</h3>
-                   <p className="text-sm text-neutral-400 mb-6 leading-relaxed font-bold">
-                     مزرعة العلا حالياً في مرحلة التزهير. تم اكتمال الدورة الثالثة من الري بنجاح.
-                   </p>
-                   <Button className="w-full bg-white text-neutral-900 font-bold hover:bg-neutral-100 rounded-xl">
-                      اطلب تقرير جرد
-                   </Button>
-                </Card>
+                <div className="bg-emerald-900 rounded-[2rem] p-8 text-white relative overflow-hidden">
+                   <div className="relative z-10">
+                     <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold italic">فرصة مميزة</span>
+                     <h3 className="text-2xl font-bold mt-2">مشروع تمور السكري</h3>
+                     <p className="text-sm text-emerald-100/80 mt-4 leading-relaxed font-medium">
+                       عائد متوقع 18% سنوياً مع ضمانات بنكية وإشراف تقني متكامل.
+                     </p>
+                     <Button className="mt-6 w-full bg-white text-emerald-900 font-bold hover:bg-emerald-50 rounded-xl transition-all">
+                        اكتشف المزيد
+                     </Button>
+                   </div>
+                   <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-800 rounded-full opacity-30" />
+                </div>
               </div>
             </div>
 
             {/* Activity Timeline Section */}
-            <section className="mt-12">
-               <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-black text-neutral-900">الجدول الزمني للأنشطة (Live Feed)</h2>
-                  <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-none font-bold">مباشر الآن</Badge>
+            <section className="mt-12 bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
+               <div className="flex items-center justify-between mb-10">
+                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">الجدول الزمني للنشاط الميداني</h2>
+                  <span className="text-xs text-emerald-600 font-bold cursor-pointer hover:underline">عرض كل النشاطات</span>
                </div>
                
-               <div className="space-y-8 relative before:absolute before:right-[23px] before:top-4 before:bottom-4 before:w-0.5 before:bg-neutral-200">
+               <div className="space-y-10 relative before:absolute before:right-[23px] before:top-4 before:bottom-4 before:w-px before:bg-slate-200">
                   {MOCK_TIMELINE.map((activity, i) => (
                     <motion.div 
                       key={activity.id}
@@ -247,58 +269,60 @@ export default function Dashboard() {
                       className="relative pr-16"
                     >
                       {/* Timeline Icon Node */}
-                      <div className={cn(
-                        "absolute right-0 top-0 w-12 h-12 rounded-2xl flex items-center justify-center z-10 border-4 border-white shadow-md",
-                        activity.type === 'irrigation' ? "bg-blue-500" : 
-                        activity.type === 'fertilization' ? "bg-emerald-500" : "bg-primary"
-                      )}>
-                        {activity.type === 'irrigation' ? <Droplets className="h-6 w-6 text-white" /> : 
-                         activity.type === 'fertilization' ? <Sprout className="h-6 w-6 text-white" /> : <MapPin className="h-6 w-6 text-white" />}
+                      <div className="absolute right-0 top-0 w-12 h-12 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm bg-slate-50 text-xl font-bold">
+                        {activity.icon}
                       </div>
 
-                      <Card className="border-none shadow-sm rounded-[2rem] overflow-hidden bg-white text-start">
-                        <div className="flex flex-col md:flex-row">
+                      <div className="flex flex-col md:flex-row gap-8">
+                        <div className="flex-1">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                             <div>
+                                <h3 className="text-xl font-bold text-slate-800 mb-1">{activity.title}</h3>
+                                <div className="flex items-center gap-3 text-sm text-slate-400 font-medium">
+                                  <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold">{activity.plot}</span>
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    {activity.time}
+                                  </span>
+                                </div>
+                             </div>
+                             <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                                <div className="text-start">
+                                  <span className="text-[10px] font-bold text-slate-400 block uppercase">المشغل</span>
+                                  <span className="text-sm font-bold text-slate-700">{activity.operator}</span>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-slate-200" />
+                             </div>
+                          </div>
+                          <p className="text-slate-600 leading-relaxed italic mb-6 text-sm">
+                            {activity.notes}
+                          </p>
+                          
                           {activity.image && (
-                            <div className="md:w-64 h-48 md:h-auto overflow-hidden">
-                              <img src={activity.image} alt="Activity" className="w-full h-full object-cover" />
+                            <div className="flex gap-4 mb-6">
+                              <div className="w-40 h-28 rounded-2xl overflow-hidden border border-slate-100 shadow-sm transition-transform hover:scale-105">
+                                <img src={activity.image} alt="Activity" className="w-full h-full object-cover" />
+                              </div>
+                              <div className="w-40 h-28 rounded-2xl overflow-hidden border border-slate-100 shadow-sm opacity-60">
+                                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400">
+                                  صورة 2
+                                </div>
+                              </div>
                             </div>
                           )}
-                          <CardContent className="p-8 flex-1">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                               <div>
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-xl font-black text-neutral-900">{activity.title}</h3>
-                                    <Badge className="bg-neutral-100 text-neutral-500 border-none text-[10px]">{activity.plot}</Badge>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-sm text-neutral-400 font-bold">
-                                    <Clock className="h-3 w-3" />
-                                    {activity.time}
-                                  </div>
-                               </div>
-                               <div className="flex items-center gap-2">
-                                  <div className="text-start">
-                                    <span className="text-[10px] font-bold text-neutral-400 block uppercase">المشغل</span>
-                                    <span className="text-sm font-bold text-neutral-900">{activity.operator}</span>
-                                  </div>
-                                  <div className="w-8 h-8 rounded-full bg-neutral-200" />
-                               </div>
-                            </div>
-                            <p className="text-neutral-600 leading-relaxed italic mb-4">
-                              {activity.notes}
-                            </p>
-                            <div className="flex items-center gap-4">
-                               <Button variant="ghost" size="sm" className="text-xs font-bold gap-2">
-                                  <ImageIcon className="h-3 w-3" />
-                                  عرض كل الصور
-                               </Button>
-                               <Button variant="ghost" size="sm" className="text-xs font-bold gap-2 text-primary">
-                                  بصمة الحماية (Blockchain)
-                                  <ShieldCheck className="h-3 w-3" />
-                                </Button>
-                            </div>
-                          </CardContent>
+
+                          <div className="flex items-center gap-4">
+                             <Button variant="ghost" size="sm" className="text-xs font-bold gap-2 text-slate-500 hover:text-emerald-600">
+                                <ImageIcon className="h-4 w-4" />
+                                صور إضافية
+                             </Button>
+                             <Button variant="ghost" size="sm" className="text-xs font-bold gap-2 text-emerald-600 hover:bg-emerald-50 rounded-xl px-4">
+                                توثيق Blockchain
+                                <ShieldCheck className="h-4 w-4" />
+                              </Button>
+                          </div>
                         </div>
-                      </Card>
+                      </div>
                     </motion.div>
                   ))}
                </div>
@@ -308,53 +332,53 @@ export default function Dashboard() {
           <div className="space-y-10">
             {/* Operator Dashboard: Simple and Action-Oriented */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-start">
-              <Card className="border-dashed border-2 border-primary/20 rounded-[2.5rem] bg-primary/5 p-10 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-primary/10 transition-colors">
-                 <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center mb-6 shadow-xl shadow-primary/20 group-hover:scale-110 transition-transform">
+              <div className="border-2 border-dashed border-emerald-600/20 rounded-[2.5rem] bg-emerald-50/50 p-12 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-emerald-50 transition-all">
+                 <div className="w-20 h-20 rounded-2xl bg-emerald-600 flex items-center justify-center mb-6 shadow-xl shadow-emerald-200/50 group-hover:scale-110 transition-all">
                     <Plus className="h-10 w-10 text-white" />
                  </div>
-                 <h2 className="text-3xl font-black text-neutral-900 mb-4">إضافة نشاط جديد</h2>
-                 <p className="text-neutral-500 max-w-sm font-bold">
-                   سجل عمليات الري، التسميد، أو الحصاد وشارك الصور مع المستثمرين بلحظة.
+                 <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">إضافة نشاط ميداني</h2>
+                 <p className="text-slate-500 max-w-sm font-semibold italic">
+                   وثق عمليات الري، التسميد، والحصاد فوراً وشاركها مع المستثمرين.
                  </p>
-              </Card>
+              </div>
 
-              <Card className="border-none shadow-sm rounded-[2.5rem] bg-white p-10 flex flex-col justify-between">
+              <div className="editorial-card p-10 flex flex-col justify-between">
                  <div>
-                    <h2 className="text-2xl font-black text-neutral-900 mb-6">المهام المعلقة</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-6 tracking-tight">المهام العاجلة</h2>
                     <div className="space-y-4">
                        {[
                          { task: "فحص تسرب مياه قطعة A-10", priority: "high" },
                          { task: "تعبئة خزان السماد رقم 2", priority: "medium" },
                          { task: "تجهيز معدات جني المحصول", priority: "low" },
                        ].map((task, i) => (
-                         <div key={i} className="flex items-center gap-4 p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
-                           {task.priority === 'high' ? <AlertCircle className="h-5 w-5 text-red-500" /> : <Clock className="h-5 w-5 text-neutral-400" />}
-                           <span className="font-bold flex-1">{task.task}</span>
-                           <Button size="sm" variant="outline" className="rounded-xl px-4">ابدأ الآن</Button>
+                         <div key={i} className="flex items-center gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 transition-all hover:bg-white hover:shadow-sm">
+                           {task.priority === 'high' ? <AlertCircle className="h-5 w-5 text-red-500" /> : <Clock className="h-5 w-5 text-slate-400" />}
+                           <span className="font-bold text-slate-700 flex-1">{task.task}</span>
+                           <Button size="sm" variant="outline" className="rounded-xl px-4 font-bold border-slate-200">ابدأ</Button>
                          </div>
                        ))}
                     </div>
                  </div>
-                 <Button className="mt-8 bg-neutral-900 hover:bg-neutral-800 text-white font-bold h-12 rounded-xl">عرض كل المهام</Button>
-              </Card>
+                 <Button className="editorial-button editorial-button-primary mt-10">عرض كافة المهام</Button>
+              </div>
             </div>
 
             <section className="text-start">
-               <h2 className="text-2xl font-black text-neutral-900 mb-8">نشاطاتك الأخيرة</h2>
+               <h2 className="text-2xl font-bold text-slate-900 mb-8 tracking-tight">آخر النشاطات المسجلة</h2>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                  {MOCK_TIMELINE.slice(0, 3).map((item) => (
-                   <Card key={item.id} className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
-                      <div className="h-40 overflow-hidden">
-                         <img src={item.image} alt="Act" className="w-full h-full object-cover" />
+                   <div key={item.id} className="editorial-card overflow-hidden group">
+                      <div className="h-44 overflow-hidden">
+                         <img src={item.image} alt="Act" className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
                       </div>
-                      <CardContent className="p-6">
+                      <div className="p-6">
                          <div className="flex items-center justify-between mb-2">
-                           <h4 className="font-black text-neutral-900">{item.title}</h4>
-                           <span className="text-[10px] text-neutral-400">{item.time}</span>
+                           <h4 className="font-bold text-slate-900">{item.title}</h4>
+                           <span className="text-[10px] text-slate-400 font-bold">{item.time}</span>
                          </div>
-                         <p className="text-xs text-neutral-500 line-clamp-2">{item.notes}</p>
-                      </CardContent>
-                   </Card>
+                         <p className="text-xs text-slate-500 line-clamp-2 italic font-medium">{item.notes}</p>
+                      </div>
+                   </div>
                  ))}
                </div>
             </section>
@@ -375,7 +399,7 @@ function BarChartIcon(props: any) {
       viewBox="0 0 24 24" 
       fill="none" 
       stroke="currentColor" 
-      strokeWidth="2" 
+      strokeWidth="2.5" 
       strokeLinecap="round" 
       strokeLinejoin="round"
     >
@@ -396,7 +420,7 @@ function TrendingUpIcon(props: any) {
       viewBox="0 0 24 24" 
       fill="none" 
       stroke="currentColor" 
-      strokeWidth="2" 
+      strokeWidth="2.5" 
       strokeLinecap="round" 
       strokeLinejoin="round"
     >

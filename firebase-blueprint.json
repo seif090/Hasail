@@ -10,6 +10,7 @@
         "displayName": { "type": "string" },
         "role": { "type": "string", "enum": ["investor", "operator", "admin"] },
         "avatarUrl": { "type": "string", "format": "uri" },
+        "walletBalance": { "type": "number" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["uid", "email", "role"]
@@ -27,7 +28,9 @@
         "location": { "type": "string" },
         "images": { "type": "array", "items": { "type": "string", "format": "uri" } },
         "description": { "type": "string" },
-        "status": { "type": "string", "enum": ["active", "closed"] }
+        "status": { "type": "string", "enum": ["active", "closed"] },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "cropType", "minInvestment", "status"]
     },
