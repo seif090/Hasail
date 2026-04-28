@@ -1,0 +1,9 @@
+{
+  "name": "منصة حصائل (Hasail)",
+  "description": "منصة احترافية لإدارة واستثمار العمليات الزراعية عن بُعد، تربط بين المستثمرين وأصحاب المزارع والمشغلين.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": []
+}

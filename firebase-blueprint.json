@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile including role-based access info",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["investor", "operator", "admin"] },
+        "avatarUrl": { "type": "string", "format": "uri" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "InvestmentOpportunity": {
+      "title": "Investment Opportunity",
+      "description": "A farming opportunity for investors",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "cropType": { "type": "string" },
+        "duration": { "type": "string" },
+        "expectedReturn": { "type": "string" },
+        "minInvestment": { "type": "number" },
+        "location": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string", "format": "uri" } },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "closed"] }
+      },
+      "required": ["title", "cropType", "minInvestment", "status"]
+    },
+    "Farm": {
+      "title": "Farm",
+      "description": "Agricultural property management",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "totalArea": { "type": "string" },
+        "plots": { "type": "array" }
+      },
+      "required": ["name", "ownerId"]
+    },
+    "Activity": {
+      "title": "Farm Activity",
+      "description": "A recorded activity on a farm plot",
+      "type": "object",
+      "properties": {
+        "farmId": { "type": "string" },
+        "plotId": { "type": "string" },
+        "type": { "type": "string", "enum": ["planting", "irrigation", "fertilization", "harvesting", "other"] },
+        "notes": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "operatorId": { "type": "string" },
+        "operatorName": { "type": "string" }
+      },
+      "required": ["farmId", "type", "timestamp", "operatorId"]
+    },
+    "Investment": {
+      "title": "Investment",
+      "description": "An investment made by a user in an opportunity",
+      "type": "object",
+      "properties": {
+        "investorId": { "type": "string" },
+        "opportunityId": { "type": "string" },
+        "amount": { "type": "number" },
+        "investedAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["active", "matured", "withdrawn"] }
+      },
+      "required": ["investorId", "opportunityId", "amount"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile data"
+    },
+    "/opportunities/{opportunityId}": {
+      "schema": "InvestmentOpportunity",
+      "description": "Public and private investment opportunities"
+    },
+    "/farms/{farmId}": {
+      "schema": "Farm",
+      "description": "Details about farm assets"
+    },
+    "/activities/{activityId}": {
+      "schema": "Activity",
+      "description": "Historical log of farm activities"
+    },
+    "/investments/{investmentId}": {
+      "schema": "Investment",
+      "description": "User investments history"
+    }
+  }
+}
