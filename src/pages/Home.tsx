@@ -130,6 +130,151 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Investment Calculator Section */}
+      <section className="py-24 bg-white overflow-hidden">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <motion.div 
+              className="lg:w-1/2"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">احسب نمو استثمارك</h2>
+              <p className="text-slate-500 text-lg mb-8 italic font-medium">خطط لمستقبلك المالي بسهولة. استخدم حاسبة حصائل لتقدير العوائد المتوقعة بناءً على حجم استثمارك ومدة المشروع.</p>
+              
+              <div className="space-y-6 bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-4 px-2 tracking-wide uppercase">مبلغ الاستثمار (ريال)</label>
+                  <input 
+                    type="range" 
+                    className="w-full h-2 bg-emerald-100 rounded-lg appearance-none cursor-pointer accent-emerald-600" 
+                    min="1000" 
+                    max="500000" 
+                    step="1000"
+                    defaultValue="50000"
+                  />
+                  <div className="flex justify-between mt-4 text-lg font-bold text-emerald-700 font-mono">
+                    <span>1,000</span>
+                    <span>50,000</span>
+                    <span>500,000</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
+                  <div className="p-6 bg-white rounded-2xl shadow-sm border border-emerald-50 text-center">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">العائد السنوي المتوقع</p>
+                    <p className="text-2xl font-bold text-emerald-600">18%</p>
+                  </div>
+                  <div className="p-6 bg-white rounded-2xl shadow-sm border border-emerald-50 text-center">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">القيمة الإجمالية بعد عام</p>
+                    <p className="text-2xl font-bold text-emerald-600">59,000 <span className="text-xs">ريال</span></p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="lg:w-1/2 relative"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="aspect-square relative rounded-[3rem] overflow-hidden shadow-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1595841696668-5272a249c56a?auto=format&fit=crop&q=80&w=1200" 
+                  alt="Agricultural Success" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-emerald-900/10 mix-blend-overlay" />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Market Insights Section */}
+      <section className="py-24 bg-slate-900 text-white overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/5 blur-[120px]" />
+        <div className="container mx-auto px-6 max-w-7xl relative z-10">
+          <div className="text-center mb-20 max-w-2xl mx-auto">
+             <h2 className="text-4xl font-bold mb-6 tracking-tight">نبض السوق الزراعي</h2>
+             <p className="text-slate-400 text-lg font-medium italic">بيانات حية ورؤى تحليلية لأسعار المحاصيل والطلب العالمي لمساعدتك في اتخاذ قرارات استثمارية مبنية على حقائق.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { crop: "البندورة (البيوت المحمية)", price: "4.50", change: "+5.2%", trend: "up" },
+              { crop: "القمح الصلب", price: "1.85", change: "-1.1%", trend: "down" },
+              { crop: "زيت الزيتون البكر", price: "42.00", change: "+12.4%", trend: "up" },
+              { crop: "حمضيات العلا", price: "8.20", change: "+2.8%", trend: "up" },
+            ].map((insight, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-8 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors"
+              >
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4 italic">{insight.crop}</p>
+                <div className="flex items-end gap-2 mb-4">
+                  <span className="text-3xl font-bold">{insight.price}</span>
+                  <span className="text-xs text-slate-500 font-medium mb-1">ريال / كجم</span>
+                </div>
+                <div className={`text-sm font-bold flex items-center gap-2 ${insight.trend === 'up' ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {insight.change} {insight.trend === 'up' ? <TrendingUp className="h-4 w-4" /> : <TrendingUp className="h-4 w-4 rotate-180" />}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vision 2030 Impact Section */}
+      <section className="py-24 bg-emerald-50 overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/40 rounded-full blur-[100px] -mr-48 -mt-48" />
+        <div className="container mx-auto px-6 max-w-7xl relative z-10 text-right">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <motion.div 
+               className="lg:w-1/2"
+               initial={{ opacity: 0, x: 30 }}
+               whileInView={{ opacity: 1, x: 0 }}
+               viewport={{ once: true }}
+            >
+               <img 
+                 src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1200" 
+                 alt="Sustainability and Vision" 
+                 className="rounded-[4rem] shadow-2xl border-8 border-white"
+               />
+            </motion.div>
+            <motion.div 
+              className="lg:w-1/2"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <span className="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em] mb-4 block italic">رؤية 2030</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight text-center md:text-right">نستثمر لمستقبل أجيالنا</h2>
+              <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium italic text-right">
+                تعد الاستدامة والأمن الغذائي من ركائز رؤية المملكة 2030. منصة حصائل تفتح لك الباب للمشاركة في هذه النهضة الوطنية، محولة الأراضي الخصبة إلى فرص استثمارية مدرّة للدخل ومستدامة بيئياً.
+              </p>
+              <div className="grid grid-cols-2 gap-8">
+                 <div className="space-y-2">
+                    <p className="text-4xl font-bold text-emerald-600 tracking-tighter">80%</p>
+                    <p className="text-sm font-bold text-slate-700 uppercase tracking-widest italic">تقليل هدر المياه</p>
+                 </div>
+                 <div className="space-y-2">
+                    <p className="text-4xl font-bold text-emerald-600 tracking-tighter">350+</p>
+                    <p className="text-sm font-bold text-slate-700 uppercase tracking-widest italic">أسرة مستفيدة</p>
+                 </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Opportunities Preview */}
       <section className="py-24 bg-slate-50 relative overflow-hidden">
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
@@ -185,6 +330,42 @@ export default function Home() {
                     </Link>
                   </div>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 bg-slate-50">
+        <div className="container mx-auto px-6 max-w-4xl text-start">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">الأسئلة الشائعة</h2>
+            <p className="text-slate-500 text-lg font-medium italic">كل ما تحتاج معرفته عن الاستثمار في منصة حصائل وكيفية البدء.</p>
+          </div>
+
+          <div className="space-y-6">
+            {[
+              { q: "كيف تضمن المنصة عوائد الاستثمار؟", a: "نقوم بدراسات جدوى معمقة واختيار مزارع تقنية عالية الكفاءة مع وجود عقود تأمين وتشغيل احترافية لتقليل المخاطر." },
+              { q: "ما هو الحد الأدنى للاستثمار؟", a: "يبدأ الاستثمار في معظم الفرص من 1,000 ريال سعودي، مما يجعلها متاحة للجميع." },
+              { q: "هل يمكنني سحب استثماري قبل نهاية المدة؟", a: "نوفر سوقاً ثانوياً يسمح للمستثمرين ببيع حصصهم لمستثمرين آخرين وفق شروط المنصة." },
+              { q: "ما هي الضمانات القانونية المتاحة؟", a: "جميع الاستثمارات موثقة بعقود رسمية ومسجلة عبر تقنيات التوثيق الرقمي (Blockchain) لضمان حقوق كافة الأطراف." }
+            ].map((item, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm"
+              >
+                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">؟</span>
+                  {item.q}
+                </h3>
+                <p className="text-slate-500 leading-relaxed font-medium italic mr-11">
+                  {item.a}
+                </p>
               </motion.div>
             ))}
           </div>

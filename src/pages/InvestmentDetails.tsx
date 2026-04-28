@@ -111,6 +111,27 @@ export default function InvestmentDetails() {
   };
 
   const [amount, setAmount] = useState<string>(item.minInvestment.toString());
+  
+  // Simulated Farm Sensors
+  const [sensors, setSensors] = useState({
+    temp: 28,
+    humidity: 45,
+    soilPh: 6.8,
+    waterLevel: 82
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSensors(prev => ({
+        temp: prev.temp + (Math.random() > 0.5 ? 0.1 : -0.1),
+        humidity: prev.humidity + (Math.random() > 0.5 ? 0.5 : -0.5),
+        soilPh: prev.soilPh + (Math.random() > 0.5 ? 0.01 : -0.01),
+        waterLevel: prev.waterLevel + (Math.random() > 0.5 ? 0.2 : -0.2)
+      }));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const [farmName, setFarmName] = useState<string>(item.title);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
@@ -277,6 +298,37 @@ export default function InvestmentDetails() {
             <p className="text-xl text-slate-600 leading-relaxed italic font-medium">
               {item.description}
             </p>
+          </section>
+
+          <section className="mb-16">
+            <div className="flex items-center justify-between mb-10">
+               <h2 className="text-3xl font-bold text-slate-900 tracking-tight">بث حي للمنشأة</h2>
+               <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">وحدات ذكية</span>
+               </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  { label: "درجة الحرارة", value: `${sensors.temp.toFixed(1)}°C`, icon: CloudSun, color: "text-amber-500", bg: "bg-amber-50" },
+                  { label: "رطوبة التربة", value: `${sensors.humidity.toFixed(0)}%`, icon: Droplets, color: "text-blue-500", bg: "bg-blue-50" },
+                  { label: "حموضة التربة", value: `${sensors.soilPh.toFixed(2)} pH`, icon: Sprout, color: "text-emerald-500", bg: "bg-emerald-50" },
+                  { label: "مستوى الري", value: `${sensors.waterLevel.toFixed(1)}%`, icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-50" },
+                ].map((sensor, i) => (
+                  <div key={i} className="p-6 bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
+                    <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110", sensor.bg)}>
+                      <sensor.icon className={cn("h-5 w-5", sensor.color)} />
+                    </div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 italic">{sensor.label}</p>
+                    <p className="text-xl font-bold font-mono text-slate-900 tracking-tighter">{sensor.value}</p>
+                  </div>
+                ))}
+            </div>
+            
+            <div className="mt-8 flex items-center gap-2 text-xs font-bold text-emerald-600 italic">
+               <TrendingUp className="h-4 w-4" /> جاري تحديث البيانات تلقائياً من الحقل...
+            </div>
           </section>
 
           <section>

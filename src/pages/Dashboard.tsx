@@ -11,7 +11,10 @@ import {
   Droplets,
   Sprout,
   Users,
-  ShieldCheck
+  ShieldCheck,
+  TrendingUp,
+  BarChart3,
+  Leaf
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -24,25 +27,41 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
 } from 'recharts';
 import { cn, formatCurrency } from "../lib/utils";
 
 const MOCK_STATS = [
-  { label: "إجمالي الاستثمارات", value: 45000, icon: TrendingUpIcon, trend: "+12.4%" },
-  { label: "العائد التراكمي", value: 6750, icon: BarChartIcon, trend: "+8.2%" },
-  { label: "مساحات مفعلة", value: 3.5, suffix: "هكتار", icon: MapPin, trend: "0%" },
-  { label: "حالة المحصول", value: "ممتازة", icon: Sprout, trend: null },
+  { label: "إجمالي الاستثمارات", value: 45000, icon: TrendingUp, trend: "+12.4%" },
+  { label: "الأرباح المتولدة", value: 3200, icon: BarChart3, trend: "+8.2%" },
+  { label: "المشاريع النشطة", value: 4, icon: Leaf, trend: "استقرار" },
+  { label: "المساحة المزروعة", value: "12 هكتار", icon: MapPin, trend: "+20%" },
 ];
 
-const MOCK_CHART_DATA = [
-  { name: 'يناير', value: 4000 },
-  { name: 'فبراير', value: 3000 },
-  { name: 'مارس', value: 2000 },
-  { name: 'ابريل', value: 2780 },
-  { name: 'مايو', value: 1890 },
-  { name: 'يونيو', value: 2390 },
-  { name: 'يوليو', value: 3490 },
+const INVESTMENT_DATA = [
+  { name: 'يناير', investment: 5000, returns: 0 },
+  { name: 'فبراير', investment: 8000, returns: 100 },
+  { name: 'مارس', investment: 15000, returns: 450 },
+  { name: 'أبريل', investment: 30000, returns: 1200 },
+  { name: 'مايو', investment: 45000, returns: 3200 },
+];
+
+const DISTRIBUTION_DATA = [
+  { name: 'حمضيات', value: 40, color: '#10b981' },
+  { name: 'خضروات', value: 30, color: '#34d399' },
+  { name: 'حبوب', value: 20, color: '#059669' },
+  { name: 'أخرى', value: 10, color: '#064e3b' },
+];
+
+const NEWS_TICKER = [
+  "ارتفاع الطلب العالمي على القمح الصلب بنسبة 4%.",
+  "افتتاح أضخم مزرعة مائية في منطقة الجوف الشهر القادم.",
+  "وزارة الزراعة تطلق مبادرة دعم التقنيات الذكية للمزارع الصغيرة.",
+  "نجاح تجربة زراعة الأنواع النادرة من الموالح في وادي الدواسر."
 ];
 
 const MOCK_TIMELINE = [
@@ -113,19 +132,31 @@ export default function Dashboard() {
 
   const userRole = userProfile?.role || UserRole.INVESTOR;
 
-  const displayStats = [
-    { 
-      label: "إجمالي الرصيد", 
-      value: userProfile?.walletBalance ?? 100000, 
-      icon: TrendingUpIcon, 
-      trend: null 
-    },
-    ...MOCK_STATS.slice(1)
-  ];
-
   return (
     <div className="bg-slate-50 min-h-screen py-10">
       <div className="container mx-auto px-6 max-w-7xl">
+        {/* News Ticker */}
+        <div className="mb-8 bg-emerald-900 text-emerald-50 px-4 py-2 rounded-2xl flex items-center gap-4 overflow-hidden shadow-sm">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">أخبار حصائل</span>
+          </div>
+          <div className="flex-1 whitespace-nowrap overflow-hidden">
+            <motion.div 
+              animate={{ x: [0, -1000] }}
+              transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
+              className="flex gap-12 font-medium italic text-xs"
+            >
+              {NEWS_TICKER.map((news, i) => (
+                <span key={i}>{news}</span>
+              ))}
+              {NEWS_TICKER.map((news, i) => (
+                <span key={`dup-${i}`}>{news}</span>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div className="text-start">
@@ -147,22 +178,44 @@ export default function Dashboard() {
           <div className="space-y-8 text-start">
             {/* Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {displayStats.map((stat, i) => (
+              {[
+                { 
+                  label: "إجمالي الاستثمارات", 
+                  value: 45000, 
+                  icon: TrendingUp, 
+                  trend: "+12.4%" 
+                },
+                { 
+                  label: "الأرباح المتولدة", 
+                  value: 3200, 
+                  icon: BarChart3, 
+                  trend: "+8.2%" 
+                },
+                { 
+                  label: "المشاريع النشطة", 
+                  value: 4, 
+                  icon: Leaf, 
+                  trend: "استقرار" 
+                },
+                { 
+                  label: "المساحة المزروعة", 
+                  value: "12 هكتار", 
+                  icon: MapPin, 
+                  trend: "+20%" 
+                },
+              ].map((stat, i) => (
                 <div key={i} className="editorial-card p-6">
-                  <p className="text-slate-400 text-sm mb-1 font-medium">{stat.label}</p>
-                  <h3 className="text-2xl font-bold text-slate-900">
-                    {typeof stat.value === 'number' ? (
-                      (stat as any).suffix ? `${stat.value} ${(stat as any).suffix}` : formatCurrency(stat.value)
-                    ) : (
-                      stat.value
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-slate-400 text-sm font-medium">{stat.label}</p>
+                    {stat.trend && (
+                      <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold">
+                        {stat.trend}
+                      </div>
                     )}
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900">
+                    {typeof stat.value === 'number' ? formatCurrency(stat.value) : stat.value}
                   </h3>
-                  {stat.trend && (
-                    <div className="mt-4 flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-0.5 rounded text-xs font-bold">
-                       <span>{stat.trend}</span>
-                       <stat.icon className="h-3 w-3" />
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -176,7 +229,7 @@ export default function Dashboard() {
                 </div>
                 <div className="h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={MOCK_CHART_DATA}>
+                    <AreaChart data={INVESTMENT_DATA}>
                       <defs>
                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#059669" stopOpacity={0.2}/>
@@ -198,7 +251,7 @@ export default function Dashboard() {
                       />
                       <Area 
                         type="monotone" 
-                        dataKey="value" 
+                        dataKey="investment" 
                         stroke="#059669" 
                         strokeWidth={3}
                         fillOpacity={1} 
@@ -207,10 +260,77 @@ export default function Dashboard() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
+
+                {/* Added: Sustainability Impact */}
+                <div className="mt-10 pt-8 border-t border-slate-100">
+                   <div className="flex items-center gap-3 mb-6">
+                      <div className="h-10 w-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
+                         <Leaf className="h-6 w-6" />
+                      </div>
+                      <h5 className="font-bold text-slate-900 tracking-tight">أثرك البيئي المستدام</h5>
+                   </div>
+                   <div className="grid grid-cols-3 gap-4">
+                      <div className="p-4 bg-slate-50/50 rounded-2xl text-center border border-slate-50">
+                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">توفير مياه</p>
+                         <p className="text-lg font-bold text-slate-900 font-mono tracking-tighter">14,200 <span className="text-xs">لتر</span></p>
+                      </div>
+                      <div className="p-4 bg-slate-50/50 rounded-2xl text-center border border-slate-50">
+                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">عزل كربون</p>
+                         <p className="text-lg font-bold text-slate-900 font-mono tracking-tighter">85 <span className="text-xs">كجم</span></p>
+                      </div>
+                      <div className="p-4 bg-slate-50/50 rounded-2xl text-center border border-slate-50">
+                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">طاقة متجددة</p>
+                         <p className="text-lg font-bold text-slate-900 font-mono tracking-tighter">120 <span className="text-xs">ك.واط</span></p>
+                      </div>
+                   </div>
+                </div>
               </div>
 
-              {/* Weather / Plot Status */}
+              {/* Weather & Distribution Section */}
               <div className="space-y-6">
+                {/* Distribution Chart */}
+                <div className="editorial-card p-8">
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-8">توزيع المحصول</h3>
+                  <div className="h-[250px] w-full mb-8">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={DISTRIBUTION_DATA}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {DISTRIBUTION_DATA.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ 
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                              borderRadius: '16px', 
+                              border: 'none', 
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                            }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="space-y-4">
+                    {DISTRIBUTION_DATA.map((item, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                          <span className="text-sm font-medium text-slate-600">{item.name}</span>
+                        </div>
+                        <span className="text-xs font-bold text-slate-900 font-mono">{item.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="editorial-card p-8 border-l-4 border-emerald-600">
                    <div className="flex items-center justify-between mb-6">
                       <div className="flex flex-col">
@@ -386,46 +506,5 @@ export default function Dashboard() {
         )}
       </div>
     </div>
-  );
-}
-
-function BarChartIcon(props: any) {
-  return (
-    <svg 
-      {...props}
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <line x1="12" x2="12" y1="20" y2="10" />
-      <line x1="18" x2="18" y1="20" y2="4" />
-      <line x1="6" x2="6" y1="20" y2="16" />
-    </svg>
-  );
-}
-
-function TrendingUpIcon(props: any) {
-  return (
-    <svg 
-      {...props}
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-      <polyline points="16 7 22 7 22 13" />
-    </svg>
   );
 }
