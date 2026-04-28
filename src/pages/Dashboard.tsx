@@ -13,10 +13,10 @@ import {
   Users,
   ShieldCheck
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Button } from "../components/ui/button";
 import { 
   AreaChart, 
   Area, 
@@ -26,7 +26,7 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "../lib/utils";
 
 const MOCK_STATS = [
   { label: "إجمالي الاستثمارات", value: 45000, icon: TrendingUpIcon, trend: "+12.4%" },

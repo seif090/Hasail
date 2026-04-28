@@ -11,24 +11,24 @@ import {
   ChevronLeft,
   ChevronDown
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import { 
   Sheet, 
   SheetContent, 
   SheetTrigger 
-} from "@/components/ui/sheet";
+} from "../components/ui/sheet";
 import { auth, getUserProfile } from "../lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { UserProfile } from "../types";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "../components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 
 const NavItems = [
   { name: "الرئيسية", path: "/", icon: HomeIcon },

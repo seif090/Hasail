@@ -17,10 +17,10 @@ import {
   BarChart3,
   TrendingUp
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { cn, formatCurrency } from "@/lib/utils";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Progress } from "../components/ui/progress";
+import { cn, formatCurrency } from "../lib/utils";
 import { auth, db, getUserProfile, handleFirestoreError, OperationType } from "../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, addDoc, serverTimestamp, updateDoc, doc, increment } from "firebase/firestore";
